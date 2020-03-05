@@ -14,7 +14,9 @@ if ($err) {
 }
 
 // Call the hello method
-$result1=$client->call('getCustomer', array('customerNumber'=>'103'));
+// $result1=$client->call('getCustomer', array('customerNumber'=>'103'));
+//  $result1=$client->call('updateCustomer', array('customerNumber'=>'103','customerName' => 'Jati Pikukuh'));
+ $result1=$client->call('deletCustomer', array('customerNumber'=>'103'));
 
 print_r($result1).'\n';
 ?>

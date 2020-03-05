@@ -19,7 +19,6 @@ $server->wsdl->addComplexType(
          'type' => 'xsd:int'))
 );
 
-// Register the "hello" method to expose it
 $server->register('getCustomer',
          array('customerNumber' => 'xsd:string'),   // parameter
          array('return' => 'xsd:string'),     // output
@@ -29,21 +28,13 @@ $server->register('getCustomer',
          'encoded',                           // use
          'mendapatkan 1 customer');                   // description
 
-// Implement the "hello" method as a PHP function
+
+
 function getCustomer($customerNumber) {
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "classicmodels";
+    require_once "./connect.php";
 
-    $conn = mysqli_connect($servername, $username, $password, $dbname);
-    // Check connection
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    $sql = "SELECT customerName FROM customers WHERE customerNumber = ".$customerNumber."";
-    $result = mysqli_query($conn, $sql);
+    $query = "SELECT customerName FROM customers WHERE customerNumber = ".$customerNumber."";
+    $result = mysqli_query($conn, $query);
 
     if (mysqli_num_rows($result) > 0) {
         // output data of each row
@@ -51,11 +42,34 @@ function getCustomer($customerNumber) {
             return $row["customerName"];
         }
     } else {
-        echo "0 results";
+        return "0 results";
     }
-
-    mysqli_close($conn);
 }
+
+$server->register('updateCustomer',
+         array(
+             'customerNumber' => 'xsd:string',
+             'customerName' => 'xsd:string',
+            ),   // parameter
+         array('return' => 'xsd:string'),     // output
+         'urn:server',                        // namespace
+         'urn:server#helloServer',            // soapaction
+         'rpc',                               // style
+         'encoded',                           // use
+         'update customer');                   // description
+
+function updateCustomer($customerNumber, $customerName){
+    require_once "./connect.php";
+
+    $query = "UPDATE customers SET customerName='".$customerName."' WHERE customerNumber=".$customerNumber."";
+
+    if (mysqli_query($conn, $query)) {
+        return "berhasil";
+    } else {
+        return "Error updating record: " . mysqli_error($conn);
+    }
+}
+
 
 $GLOBALS['HTTP_RAW_POST_DATA'] = file_get_contents ('php://input');
 $HTTP_RAW_POST_DATA = $GLOBALS['HTTP_RAW_POST_DATA'];
